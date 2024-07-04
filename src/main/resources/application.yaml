@@ -9,14 +9,18 @@ spring:
   docker:
     compose:
       enabled: false
+  liquibase:
+    change-log: classpath:/db/changelog/dbchangelog.yaml
+    url: jdbc:oracle:thin:@//localhost:1521/FREEPDB1
+    user: REST_API_APP
+    password: pass
 ---
 spring:
   config:
     activate:
       on-profile: local
   datasource:
-    hikari:
-      jdbc-url: jdbc:oracle:thin:@//localhost:1521/FREEPDB1
-      username: REST_API_APP
-      password: pass
-      driver-class-name: oracle.jdbc.OracleDriver
+    jdbc-url: jdbc:oracle:thin:@//localhost:1521/FREEPDB1
+    username: REST_API_APP
+    password: pass
+    driver-class-name: oracle.jdbc.OracleDriver

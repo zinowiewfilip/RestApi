@@ -1,0 +1,15 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: fzino
+      changes:
+        - createTable:
+            schemaName: REST_API
+            tableName: REQUESTS_COUNT_WITH_LOGIN
+            columns:
+              - column:
+                  name: LOGIN
+                  type: VARCHAR(30)
+              - column:
+                  name: REQUEST_COUNT
+                  type: NUMBER
