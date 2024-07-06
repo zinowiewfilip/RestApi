@@ -13,3 +13,13 @@ databaseChangeLog:
               - column:
                   name: REQUEST_COUNT
                   type: NUMBER
+  - changeSet:
+      id: 2
+      author: fzino
+      changes:
+        - addPrimaryKey:
+            schemaName: REST_API
+            tableName: REQUESTS_COUNT_WITH_LOGIN
+            columnNames: LOGIN
+            constraintName: PK_LOGIN
+            validate: true
