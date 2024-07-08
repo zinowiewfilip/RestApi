@@ -1,16 +1,19 @@
 package com.java.restapi.service;
 
-import com.java.restapi.common.UrlCommon;
 import com.java.restapi.common.WebClientService;
 import com.java.restapi.dto.GitHubUsersApiResponseDTO;
 import com.java.restapi.dto.RestApiResponseDTO;
 import com.java.restapi.mapper.RestApiResponseMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class RestApiServiceImpl implements RestApiService {
+
+    @Value("${api.url}")
+    private String API_URL;
 
     private final WebClientService webClientService;
 
@@ -24,6 +27,6 @@ public class RestApiServiceImpl implements RestApiService {
         return this.restApiResponseMapper
                 .toRestApiResponseDTO(
                         this.webClientService.getObject(
-                                UrlCommon.API_URL + login, GitHubUsersApiResponseDTO.class));
+                                API_URL + login, GitHubUsersApiResponseDTO.class));
     }
 }

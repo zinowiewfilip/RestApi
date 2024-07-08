@@ -16,6 +16,8 @@ spring:
     user: REST_API_APP
     password: pass
     default-schema: REST_API
+api:
+  url: "https://api.github.com/users/"
 ---
 spring:
   config:

@@ -2,7 +2,7 @@ package com.java.restapi.common;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.java.restapi.errorhandling.dto.ServiceResponse;
-import com.java.restapi.errorhandling.exceptions.GeneralServiceException;
+import com.java.restapi.errorhandling.exception.GeneralServiceException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
@@ -32,9 +32,10 @@ public class WebClientService {
     private Mono<Throwable> handleError(ClientResponse clientResponse) {
         return clientResponse.bodyToMono(String.class).flatMap(body -> {
             try {
-                return Mono.error(new GeneralServiceException(
-                        this.mapper.readValue(body.getBytes(), ServiceResponse.class).getErrorCode(),
-                        this.mapper.readValue(body.getBytes(), ServiceResponse.class).getErrorMessage()));
+                return Mono.error(GeneralServiceException.builder()
+                        .errorCode(this.mapper.readValue(body.getBytes(), ServiceResponse.class).getErrorCode())
+                        .errorMessage(this.mapper.readValue(body.getBytes(), ServiceResponse.class).getErrorMessage())
+                        .build());
             } catch (Exception e) {
                 return Mono.error(new RuntimeException("There is a problem with processing your request"));
             }

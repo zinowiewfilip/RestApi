@@ -1,6 +1,6 @@
 package com.java.restapi.model;
 
-import com.java.restapi.common.TableNames;
+import com.java.restapi.common.TableName;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -11,7 +11,7 @@ import lombok.experimental.SuperBuilder;
 import java.io.Serializable;
 
 @Entity
-@Table(name = TableNames.REQUESTS_COUNT_WITH_LOGIN, schema = "REST_API")
+@Table(name = TableName.REQUESTS_COUNT_WITH_LOGIN)
 @Getter
 @Setter
 @ToString

@@ -1,0 +1,26 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: fzino
+      changes:
+        - createTable:
+            tableName: REQUESTS_COUNT_WITH_LOGIN
+            columns:
+              - column:
+                  name: LOGIN
+                  type: VARCHAR(30)
+              - column:
+                  name: REQUEST_COUNT
+                  type: NUMBER
+        - addNotNullConstraint:
+            tableName: REQUESTS_COUNT_WITH_LOGIN
+            columnName: LOGIN
+  - changeSet:
+      id: 2
+      author: fzino
+      changes:
+        - addPrimaryKey:
+            tableName: REQUESTS_COUNT_WITH_LOGIN
+            columnNames: LOGIN
+            constraintName: PK_LOGIN
+            validate: true

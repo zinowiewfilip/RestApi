@@ -1,0 +1,26 @@
+spring:
+  profiles:
+    active: test
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+    database:
+    database-platform: org.hibernate.dialect.H2Dialect
+  docker:
+    compose:
+      enabled: false
+  datasource:
+    url: jdbc:h2:mem:db
+    username: sa
+    password: sa
+    driver-class-name: org.h2.Driver
+  liquibase:
+    change-log: classpath:/db/changelog/dbchangelogtest.yaml
+    user: sa
+    password: sa
+api:
+  url: "https://api.github.com/users/"
