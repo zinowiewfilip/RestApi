@@ -1,21 +1,31 @@
 package com.java.restapi.config;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
 
 @Configuration
 public class BeansConfig {
 
     @Bean
-    public WebClient.Builder webClientBuilder() {
-        return WebClient.builder();
+    public WebClient webClient() {
+       final int size = 2097152;
+       final ExchangeStrategies strategies = ExchangeStrategies.builder()
+               .codecs(codecs -> codecs.defaultCodecs().maxInMemorySize(size))
+               .build();
+
+       return WebClient.builder()
+               .exchangeStrategies(strategies)
+               .build();
     }
 
     @Bean
     public ObjectMapper mapper() {
-        return new ObjectMapper();
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.configure(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE, false);
+        return mapper.findAndRegisterModules();
     }
 }

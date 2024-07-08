@@ -6,14 +6,16 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.io.Serializable;
 
 @Entity
-@Table(name = TableNames.REQUESTS_COUNT_WITH_LOGIN)
+@Table(name = TableNames.REQUESTS_COUNT_WITH_LOGIN, schema = "REST_API")
 @Getter
 @Setter
 @ToString
+@SuperBuilder
 @RequiredArgsConstructor
 public class RestApiEntity implements Serializable {
 

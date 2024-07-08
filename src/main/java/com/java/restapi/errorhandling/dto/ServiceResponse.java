@@ -16,5 +16,4 @@ public class ServiceResponse implements Serializable {
 
     private String errorCode;
 
-
 }

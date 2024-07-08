@@ -4,28 +4,23 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.java.restapi.errorhandling.dto.ServiceResponse;
 import com.java.restapi.errorhandling.exceptions.GeneralServiceException;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
-import java.time.Duration;
 
 @Component
 @RequiredArgsConstructor
 public class WebClientService {
 
-    private static final Duration REQUEST_TIMEOUT = Duration.ofSeconds(30);
+    private final WebClient webClient;
 
-    private static final Duration MINIMUM_REQUEST_TIMEOUT = Duration.ofSeconds(2);
-
-    private final WebClient.Builder webClientBuilder;
     private final ObjectMapper mapper;
 
     public <R> R getObject(String url, Class<R> returnType) {
-        return this.webClientBuilder.baseUrl(url).build()
+        return this.webClient
                 .get()
                 .uri(url)
                 .retrieve()

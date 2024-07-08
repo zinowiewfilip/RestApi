@@ -5,6 +5,7 @@ spring:
     show-sql: true
     properties:
       hibernate:
+        default_schema: REST_API
         format_sql: true
   docker:
     compose:
@@ -14,13 +15,14 @@ spring:
     url: jdbc:oracle:thin:@//localhost:1521/FREEPDB1
     user: REST_API_APP
     password: pass
+    default-schema: REST_API
 ---
 spring:
   config:
     activate:
       on-profile: local
   datasource:
-    jdbc-url: jdbc:oracle:thin:@//localhost:1521/FREEPDB1
+    url: jdbc:oracle:thin:@//localhost:1521/FREEPDB1
     username: REST_API_APP
     password: pass
     driver-class-name: oracle.jdbc.OracleDriver
