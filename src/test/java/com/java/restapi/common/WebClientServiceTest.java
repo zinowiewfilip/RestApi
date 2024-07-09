@@ -2,77 +2,86 @@ package com.java.restapi.common;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.java.restapi.dto.GitHubUsersApiResponseDTO;
+import com.java.restapi.errorhandling.dto.ServiceResponse;
+import com.java.restapi.errorhandling.exception.GeneralServiceException;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
-import reactor.test.StepVerifier;
 
-import java.io.IOException;
-
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 
 @ExtendWith(MockitoExtension.class)
-@SpringBootTest
-@ActiveProfiles("test")
-class WebClientServiceTest {
+public class WebClientServiceTest {
+
+    private MockWebServer mockWebServer;
 
     @Mock
-    private GitHubUsersApiResponseDTO gitHubUsersApiResponseDTO;
-
-    @Autowired
-    private WebClient webClient;
-
-    @MockBean
-    private WebClient.Builder webClientBuilder;
+    private ObjectMapper mapper;
 
     @Mock
-    private ObjectMapper objectMapper;
+    private ServiceResponse serviceResponse;
 
     @InjectMocks
     private WebClientService webClientService;
 
-    public static MockWebServer mockWebServer;
-
     @BeforeEach
-    void setUp() {
+    void setUp() throws Exception {
         mockWebServer = new MockWebServer();
-        doReturn(webClientBuilder).when(webClientBuilder).baseUrl(mockWebServer.url("/").toString());
-        doReturn(WebClient.builder().baseUrl(mockWebServer.url("/").toString()).build()).when(webClientBuilder).build();
+        mockWebServer.start();
+        webClientService = new WebClientService(WebClient.builder().baseUrl(mockWebServer.url("/").toString()).build(), mapper);
     }
 
     @AfterEach
-    void tearDown() throws IOException {
+    void tearDown() throws Exception {
         mockWebServer.shutdown();
     }
 
     @Test
-    public void testIfWebClientIsReturningCorrectData() {
-        String mockResponseBody = "{\"type\":\"User\"}";
+    void testGetObjectSuccess() {
+        String expectedResponse = "{\"name\":\"octocat\"}";
         mockWebServer.enqueue(new MockResponse()
-                .setBody(mockResponseBody)
+                .setBody(expectedResponse)
                 .addHeader("Content-Type", "application/json")
                 .setResponseCode(HttpStatus.OK.value()));
 
-        Mono<GitHubUsersApiResponseDTO> responseMono = Mono.just(webClientService.getObject("/test", GitHubUsersApiResponseDTO.class)); //didn't have time to check it correctly
+        String url = "/users/octocat";
+        GitHubUsersApiResponseDTO response = webClientService.getObject(url, GitHubUsersApiResponseDTO.class);
 
+        assertEquals("octocat", response.getName());
+    }
 
-        // Verify the result
-        StepVerifier.create(responseMono)
-                .expectNextMatches(response -> "type".equals(response.getType()))
-                .verifyComplete();
+    @Test
+    void testGetObjectError() throws Exception {
+        String errorResponse = "{\"errorCode\":\"404\",\"errorMessage\":\"Not Found\"}";
 
+        mockWebServer.enqueue(new MockResponse()
+                .setBody(errorResponse)
+                .addHeader("Content-Type", "application/json")
+                .setResponseCode(HttpStatus.NOT_FOUND.value()));
+
+        doReturn(String.valueOf(HttpStatus.NOT_FOUND.value())).when(serviceResponse).getErrorCode();
+        doReturn(HttpStatus.NOT_FOUND.toString()).when(serviceResponse).getErrorMessage();
+        doReturn(serviceResponse).when(mapper).readValue(any(byte[].class), eq(ServiceResponse.class));
+
+        String url = "/users/octocat";
+
+        GeneralServiceException exception = assertThrows(GeneralServiceException.class, () -> webClientService.getObject(url, GitHubUsersApiResponseDTO.class));
+
+        assertAll(
+                () -> assertEquals(String.valueOf(HttpStatus.NOT_FOUND.value()), exception.getErrorCode()),
+                () -> assertEquals(HttpStatus.NOT_FOUND.toString(), exception.getErrorMessage())
+        );
     }
 }
 
