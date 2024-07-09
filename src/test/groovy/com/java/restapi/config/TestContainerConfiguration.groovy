@@ -23,12 +23,12 @@ class TestContainerConfiguration {
     OracleContainer oracleContainer() {
         String regex = ".*DATABASE IS READY TO USE!.*\\s"
         final OracleContainer oracleContainer = new OracleContainer("gvenzl/oracle-free:latest")
+                .waitingFor(Wait.forLogMessage(regex, 1))
                 .withUsername("REST_API")
                 .withCopyToContainer(
                         MountableFile.forHostPath("docker-rest-api/oracle/"),
                         "/docker-entrypoint-initdb.d/"
                 )
-                .waitingFor(Wait.forLogMessage(regex, 1))
 
         return oracleContainer
     }

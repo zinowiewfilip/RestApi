@@ -62,7 +62,7 @@ class RestApiControllerSpec extends BaseDatabaseSpec {
         restApiService.getInformationAboutUser(testLogin)
 
         then:
-        final ResponseExceptionHandler.ExceptionResponse response = thrown()
+        final Exception exception = thrown()
     }
 
 
